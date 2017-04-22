@@ -12,11 +12,12 @@ public class AsteroidController : MonoBehaviour {
 
 
     #region Properties & Variables
-
-    public float influenceDistance;     // How close the asteroid has to be before being affected by gravity
+    
     public float damage;
     public float mass;
-    public float gravityDampRange;      // Once the asteroid is this close the gravitational effects eaken (should help orbits?)
+
+    public float minimumGravityRatio;  // The lowest effectiveness the gravitational effect can be
+    public float maxGravityRange;       // Once the asteroid is this close the gravitational effects hit max (should help orbits?)
 
     private float influenced;           // Ratio (0-1) of how much influence Pluto's gravity has on this asteroid
 
@@ -28,9 +29,7 @@ public class AsteroidController : MonoBehaviour {
     void Start ()
     {
         // Cache my RigidBody
-        rb = gameObject.GetComponent<Rigidbody2D>();
-
-		// Debug: For now assign some random force?
+        rb = gameObject.GetComponent<Rigidbody2D>();        
 	}
 	
 	void Update ()
@@ -45,13 +44,14 @@ public class AsteroidController : MonoBehaviour {
             Vector3 angleToPluto = PlutoController.Instance.transform.position - transform.position;
             float distanceToPluto = Mathf.Abs(angleToPluto.magnitude);
 
-            if (distanceToPluto < influenceDistance)
+            if (distanceToPluto < PlutoController.Instance.influence)
             {
-                // Get damp ratio
-                float dampRatio = Mathf.Min(distanceToPluto / gravityDampRange, 1f);
+                // Calculate the effectiveness, then cap it at the minimum
+                float ratio = Mathf.Min(maxGravityRange / distanceToPluto, 1f);
+                if (ratio < minimumGravityRatio) ratio = minimumGravityRatio;
 
                 // Apply gravitational force to our momentum
-                rb.AddForce(angleToPluto.normalized * gravity * dampRatio);
+                rb.AddForce(angleToPluto.normalized * gravity * ratio);
             }
         }
 	}

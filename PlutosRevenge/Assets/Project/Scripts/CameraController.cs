@@ -14,8 +14,13 @@ public class CameraController : MonoBehaviour {
 
     #region Properties & Variables
 
+    // Follow params
     public float dampTime = 0.15f;
     private Vector3 velocity = Vector3.zero;
+
+    // Zoom params
+    public float minimumZoom = 10f;
+    public float maximumZoom = 25f;
 
     #endregion Properties & Variables
 
@@ -28,9 +33,9 @@ public class CameraController : MonoBehaviour {
 
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
+        // Follow
         if (target)
         {
             Vector3 point = myCamera.WorldToViewportPoint(target.position);
@@ -38,6 +43,10 @@ public class CameraController : MonoBehaviour {
             Vector3 destination = transform.position + delta;
             transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, dampTime);
         }
+
+        // TODO: Tween this for maximum smooooooooothness
+        // Set the zoom level
+        myCamera.orthographicSize = minimumZoom + (maximumZoom - minimumZoom) * PlutoController.Instance.speedRatio;
     }
 
     #endregion MonoBehaviourImplementation
