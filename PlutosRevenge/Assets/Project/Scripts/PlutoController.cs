@@ -4,13 +4,23 @@ using UnityEngine;
 
 public class PlutoController : Singleton<PlutoController>
 {
+    #region Cached Components
+
+    public Rigidbody2D rb;
+    public CircleCollider2D col;
+
+    #endregion Cached Components
+
     #region Properties & Variables
 
     // Movement Params
     public float speed;
-    public float turnSpeed; // Is this going to be used?
-    public float gravity;
+    public float gravityForce;
+    public float gravityBuildTime;              // TIme to hit max gravity in seconds
     public float distanceFromCamera = 10f;
+
+    // Publicly exposed gravity
+    [HideInInspector] public float gravity = 0f;
 
     #endregion Properties & Variables
 
@@ -21,23 +31,34 @@ public class PlutoController : Singleton<PlutoController>
     {
 		
 	}
-	
+
+    void FixedUpdate()
+    {
+        // Movement (Left Mouse)
+        if (Input.GetMouseButton(0))
+        {
+            // Apply momentum in that direction
+            rb.AddForce(transform.right * speed);
+        }
+    }
+
 	// Get player Inputs
 	void Update ()
     {
         // Calculate and set player's facing direction
         SetFacingDirection();
-
-        // Movement (Left Mouse)
-        if (Input.GetMouseButtonDown(0))
-        {
-            // TODO
-        }
-
+        
         // Gravity (Right Mouse)
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButton(1))
         {
-            // TODO
+            if (gravity < gravityForce)
+            {
+                gravity = Mathf.Min(gravityForce, gravity + (gravityForce * Time.deltaTime / gravityBuildTime));
+            }
+        }
+        else if (gravity > 0)
+        {
+            gravity = 0;
         }
 	}
 
