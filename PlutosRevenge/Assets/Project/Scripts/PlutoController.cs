@@ -193,10 +193,23 @@ public class PlutoController : Singleton<PlutoController>
             AdjustHealth(-20);
     }
 
-#endregion MonoBehaviour Implementation
-    
+    #endregion MonoBehaviour Implementation
 
-#region Private Helpers
+
+    #region Public Interface
+
+    public void AdjustHealth(int amount)
+    {
+        health += amount;
+
+        if (healthChanged != null)
+            healthChanged(health);
+    }
+
+    #endregion Public Interface
+
+
+    #region Private Helpers
 
     // Takes the current mouse position and converts it into a direction for pluto to face
     private void SetFacingDirection()
@@ -218,14 +231,6 @@ public class PlutoController : Singleton<PlutoController>
             currentFace = newFace;
             faceSprite.sprite.name = faceSprites[newFace];  // Is this going to work?
         }
-    }
-
-    private void AdjustHealth(int amount)
-    {
-        health += amount;
-        
-        if (healthChanged != null)
-            healthChanged(health);
     }
 
 #endregion Private Helpers

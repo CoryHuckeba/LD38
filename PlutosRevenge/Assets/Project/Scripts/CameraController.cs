@@ -19,8 +19,8 @@ public class CameraController : MonoBehaviour {
     private Vector3 velocity = Vector3.zero;
 
     // Zoom params
-    public float minimumZoom = 10f;
-    public float maximumZoom = 25f;
+    public float minimumZoom = 15f;
+    public float maximumZoom = 30f;
 
     #endregion Properties & Variables
 
