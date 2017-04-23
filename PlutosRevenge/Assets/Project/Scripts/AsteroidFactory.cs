@@ -72,6 +72,11 @@ public class AsteroidFactory : Singleton<AsteroidFactory> {
 
     #region Public Interface
 
+    public void ReduceAsteroidCount()
+    {
+        if (asteroidCount > 0)
+            asteroidCount--;        
+    }
 
     #endregion Public Interface
 
@@ -88,7 +93,7 @@ public class AsteroidFactory : Singleton<AsteroidFactory> {
         float chance = Random.Range(0f, 1f);
 
         // Instantiate a prefab depending on the chance
-        if (chance < .1f)
+        if (chance < 2f)
             Instantiate(largeAsteroidPrefab, randomSpawn.position, randomSpawn.rotation);        // 10% chance large
         else if (chance < .3f)
             Instantiate(mediumAsteroidPrefab, randomSpawn.position, randomSpawn.rotation);       // 20% chance medium

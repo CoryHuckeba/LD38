@@ -19,7 +19,6 @@ public class HealthBar : MonoBehaviour {
 	
 	private void UpdateHealth(int newHP)
     {
-        Debug.Log(" A THING HAPPENED: " + (float)newHP / PlutoController.Instance.maxhealth);
         fillBar.fillAmount = (float)newHP / PlutoController.Instance.maxhealth;
     }
 }
