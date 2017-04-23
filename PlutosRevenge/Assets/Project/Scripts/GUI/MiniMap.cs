@@ -7,6 +7,7 @@ public class MiniMap : MonoBehaviour {
 
     #region Cached Components
 
+    // GUI Objects
     public GameObject panel;
 
     // Celestial bodies
@@ -20,6 +21,11 @@ public class MiniMap : MonoBehaviour {
     public GameObject uranus;
     public GameObject neptune;
 
+    // Camera Stuffs
+    public Camera minimapCamera;
+    private Transform player;
+    private float z;
+
     #endregion Cached Components
 
 
@@ -32,8 +38,9 @@ public class MiniMap : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-
-	}
+        z = minimapCamera.transform.position.z;
+        player = PlutoController.Instance.transform;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -42,6 +49,9 @@ public class MiniMap : MonoBehaviour {
         {
             ToggleMap();
         }
+
+        // Center the camera on the player
+        minimapCamera.transform.position = new Vector3(player.position.x, player.position.y, z);
 	}
 
 
