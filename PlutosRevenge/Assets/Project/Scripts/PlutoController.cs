@@ -61,14 +61,11 @@ public class PlutoController : Singleton<PlutoController>
     Vector3 DOWN = new Vector3(0, -1, 0);
 
     // Face state values
-    private PlutoFaces currentFace = PlutoFaces.Default;
-    private Dictionary<PlutoFaces, string> faceSprites = new Dictionary<PlutoFaces, string>
-    {
-        { PlutoFaces.Default, "pluto_default.png" },
-        { PlutoFaces.Gravity, "pluto_gravity.png" },
-        { PlutoFaces.MovingFast, "pluto_fast.png" },
-        { PlutoFaces.Hurt, "pluto_hurt.png" }
-    };
+    public float hurtFaceTime = 1f;
+    
+    private bool fastFace = false;
+    private bool hurtFace = false;
+    private bool gravityFace = false;
 
     // Events
     public event System.Action<int> healthChanged;
@@ -85,27 +82,10 @@ public class PlutoController : Singleton<PlutoController>
         // Set tracking variables to initial values
         health = maxhealth;
         boost = maxBoost;
-	}
+    }
 
     void FixedUpdate()
     {
-        #if MOUSE_MOVEMENT
-        // Movement (Left Mouse)
-        if (Input.GetMouseButton(0))
-        {
-            // Apply momentum in that direction
-            rb.AddForce(transform.right * speed);
-
-            // Cap speed at maximum
-            if (rb.velocity.magnitude > maxSpeed)
-                rb.velocity = rb.velocity.normalized * maxSpeed;
-
-            // Update speed ratio
-            speedRatio = rb.velocity.magnitude/maxSpeed;
-        }
-        #elif KEY_MOVEMENT
-
-
         Vector3 keyVelocity = Vector3.zero;
 
         // Directional force
@@ -132,21 +112,16 @@ public class PlutoController : Singleton<PlutoController>
 
         // Update speed ratio
         speedRatio = rb.velocity.magnitude / maxSpeed;
-
-        #endif
     }
 
 	// Get player Inputs
 	void Update ()
     {
-        #if MOUSE_MOVEMENT
-        // Calculate and set player's facing direction
-        SetFacingDirection();
-        #endif
-        
         // Gravity (Left Mouse)
         if (Input.GetMouseButton(0))
         {
+            gravityFace = true;
+
             if (gravity < gravityForce)
             {
                 gravity = Mathf.Min(gravityForce, gravity + (gravityForce * Time.deltaTime / gravityBuildTime));
@@ -154,8 +129,11 @@ public class PlutoController : Singleton<PlutoController>
         }
         else if (gravity > 0)
         {
+            gravityFace = false;
             gravity = 0;
         }
+        else
+            gravityFace = false;
 
         // Boost
         if (Input.GetKey(KeyCode.LeftShift))
@@ -179,18 +157,19 @@ public class PlutoController : Singleton<PlutoController>
         // Boost screenshake start
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
+            fastFace = true;
             // TODO
         }
 
         // Boost screenshake end
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-             // TODO
+            fastFace = false;
+            // TODO
         }
 
-        // DEBUG
-        if (Input.GetKeyDown(KeyCode.Space))
-            AdjustHealth(-20);
+        // Set the proper face yo
+        SetCurrentFace();
     }
 
     #endregion MonoBehaviour Implementation
@@ -204,6 +183,8 @@ public class PlutoController : Singleton<PlutoController>
 
         if (healthChanged != null)
             healthChanged(health);
+
+        StartCoroutine(HurtFace());
     }
 
     #endregion Public Interface
@@ -224,14 +205,31 @@ public class PlutoController : Singleton<PlutoController>
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));        
     }
 
-    private void SetCurrentFace(PlutoFaces newFace)
+    private void SetCurrentFace()
     {
-        if (newFace > currentFace)
-        {
-            currentFace = newFace;
-            faceSprite.sprite.name = faceSprites[newFace];  // Is this going to work?
-        }
+        if (hurtFace)
+            FaceManager.Instance.SetFace(PlutoFaces.Hurt);
+        else if (gravityFace)
+            FaceManager.Instance.SetFace(PlutoFaces.Gravity);
+        else if (fastFace)
+            FaceManager.Instance.SetFace(PlutoFaces.MovingFast);
+        else
+            FaceManager.Instance.SetFace(PlutoFaces.Default);
     }
 
-#endregion Private Helpers
+    private IEnumerator HurtFace()
+    {
+        hurtFace = true;
+
+        float time = 0f;
+        while (time < hurtFaceTime)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        hurtFace = false;
+    }
+
+    #endregion Private Helpers
 }
