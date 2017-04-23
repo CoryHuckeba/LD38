@@ -2,6 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Struct to contain information for each of the asteroid sizes
+[System.Serializable]
+public struct AsteroidStats
+{
+    public float mass;
+    public float damage;
+    public float startingVelocity;
+}
+
+public enum AsteroidSize
+{
+    Small = 1,
+    Medium = 2,
+    Large = 3
+}
+
 public class AsteroidController : MonoBehaviour {
 
     #region Cached Components
@@ -11,26 +27,29 @@ public class AsteroidController : MonoBehaviour {
     #endregion Cached Components
 
 
-    #region Properties & Variables
-    
-    public float damage;
-    public float mass;
+    #region Properties & Variables    
 
-    public float minimumGravityRatio;  // The lowest effectiveness the gravitational effect can be
+    public AsteroidSize size;
+    public AsteroidStats stats;
+
+    public float minimumGravityRatio;   // The lowest effectiveness the gravitational effect can be
     public float maxGravityRange;       // Once the asteroid is this close the gravitational effects hit max (should help orbits?)
 
-    private float influenced;           // Ratio (0-1) of how much influence Pluto's gravity has on this asteroid
+    public float randomAngle;   // Once spawned the direction the asteroid is facing will be randomly changed within this range (left and right)
+
+    private float influenced;   // Ratio (0-1) of how much influence Pluto's gravity has on this asteroid
 
     #endregion Properties & Variables
 
 
     #region MonoBehaviour Implementation
-
+    
     void Start ()
     {
         // Cache my RigidBody
-        rb = gameObject.GetComponent<Rigidbody2D>();        
-	}
+        rb = gameObject.GetComponent<Rigidbody2D>();
+        rb.velocity = new Vector2(transform.right.x, transform.right.y) * stats.startingVelocity;
+    }
 	
 	void Update ()
     {
@@ -55,6 +74,12 @@ public class AsteroidController : MonoBehaviour {
             }
         }
 	}
+    
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // If this was another asteroid reduce our size by one    
+        // TODO:
+    }
 
     #endregion MonoBehaviour Implementation
 }
