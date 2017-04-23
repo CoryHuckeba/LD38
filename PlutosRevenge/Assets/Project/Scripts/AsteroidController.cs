@@ -104,12 +104,12 @@ public class AsteroidController : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        //// If this was another asteroid reduce our size by one    
-        //if (collision.gameObject.tag == "Pluto")
-        //{
-        //    PlutoController.Instance.AdjustHealth(stats.damage * -1);
-        //    Destroy(gameObject);
-        //}
+        // If this was another asteroid reduce our size by one    
+        if (collision.gameObject.tag == "Pluto")
+        {
+            PlutoController.Instance.AdjustHealth(stats.damage * -1);
+            Destroy(gameObject);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
